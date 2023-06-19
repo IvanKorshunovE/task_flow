@@ -1,26 +1,24 @@
 {% extends "base.html" %}
-
 {% block content %}
-  <h1>
-    {{ worker.username }}
-    <a href="{% url 'tasks:worker-update' pk=worker.id %}" class="btn btn-secondary link-to-page">
-      Update worker's information
-    </a>
-    <a href="{% url 'tasks:worker-delete' pk=worker.id %}" class="btn btn-danger link-to-page">
-      Delete worker
-    </a>
-  </h1>
-  <p>Username: {{ worker.username }}</p>
-  {% if worker.first_name and worker.last_name %}
-    <p>First name: {{ worker.first_name }}</p>
-    <p>Last name: {{ worker.last_name }}</p>
-  {% endif %}
-  <h1>
-    Tasks
-  </h1>
-  <hr>
-{#  <ul>#}
-  <table class="table table-hover">
+<h1>
+  {{ worker.username }}
+  <a href="{% url 'tasks:worker-update' pk=worker.id %}" class="btn btn-secondary link-to-page">
+    Update worker's information
+  </a>
+  <a href="{% url 'tasks:worker-delete' pk=worker.id %}" class="btn btn-danger link-to-page">
+    Delete worker
+  </a>
+</h1>
+<p>Username: {{ worker.username }}</p>
+{% if worker.first_name and worker.last_name %}
+<p>First name: {{ worker.first_name }}</p>
+<p>Last name: {{ worker.last_name }}</p>
+{% endif %}
+<h1>
+  Tasks
+</h1>
+<hr>
+<table class="table table-hover">
   <thead>
     <tr>
       <th scope="col">ID</th>
@@ -34,35 +32,34 @@
   </thead>
   <tbody>
     {% for task in worker.tasks.all %}
-        <tr
-            {% if task.priority == "critical" %} style="background-color: #ffcccc;"
-            {% elif task.priority == "urgent"%} style="background-color:  #ffe6cc;"
-            {% endif %}
-        >
-          <th scope="row">
-            <a href="{% url "tasks:task-detail" pk=task.id %} ">{{ task.id }}</a>
-          </th>
-          <td>{{ task.name }}</td>
-          <td>{{ task.priority }}</td>
-          <td>{{ task.deadline }}</td>
-          <td>
-{#            {% if task in user.tasks.all %}#}
-            {% if task in my_tasks %}
-              <a
-                  href="{% url 'tasks:assign-task' pk=task.id %}?source=worker-detail&worker_id={{ worker.id }}"
-                  class="btn btn-warning link-to-page">
-                Delete me from this task
-              </a>
-            {% else %}
-              <a
-                  href="{% url 'tasks:assign-task' pk=task.id %}?source=worker-detail&worker_id={{ worker.id }}"
-                 class="btn btn-info link-to-page">
-                Assign me to this task
-              </a>
-            {% endif %}
-          </td>
-        </tr>
+    <tr
+    {% if task.priority == "critical" %} style="background-color: #ffcccc;"
+    {% elif task.priority == "urgent"%} style="background-color:  #ffe6cc;"
+    {% endif %}
+    >
+    <th scope="row">
+      <a href="{% url "tasks:task-detail" pk=task.id %} ">{{ task.id }}</a>
+    </th>
+    <td>{{ task.name }}</td>
+    <td>{{ task.priority }}</td>
+    <td>{{ task.deadline }}</td>
+    <td>
+      {% if task in my_tasks %}
+      <a
+        href="{% url 'tasks:assign-task' pk=task.id %}?source=worker-detail&worker_id={{ worker.id }}"
+        class="btn btn-warning link-to-page">
+        Delete me from this task
+      </a>
+      {% else %}
+      <a
+        href="{% url 'tasks:assign-task' pk=task.id %}?source=worker-detail&worker_id={{ worker.id }}"
+        class="btn btn-info link-to-page">
+        Assign me to this task
+      </a>
+      {% endif %}
+    </td>
+    </tr>
     {% endfor %}
   </tbody>
-  </table>
+</table>
 {% endblock %}

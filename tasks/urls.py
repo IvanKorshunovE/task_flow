@@ -53,7 +53,6 @@ urlpatterns = [
         TaskDeleteView.as_view(),
         name="task-delete",
     ),
-
     path(
         "workers/",
         WorkerListView.as_view(),
