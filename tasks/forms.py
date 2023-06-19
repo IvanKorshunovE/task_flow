@@ -7,6 +7,49 @@ from django.forms import DateInput
 from tasks.models import Task, Worker
 
 
+class TaskSearchForm(forms.Form):
+    search_field = forms.CharField(
+        max_length=255,
+        required=False,
+        label="",
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "Search the name of the task",
+                "class": "form-control;",
+                "style": "width: 300px",
+                "type": "text",
+            }
+        )
+    )
+    priority = forms.MultipleChoiceField(
+        choices=(
+            ('critical', 'Critical'),
+            ('urgent', 'Urgent'),
+            ('normal', 'Normal'),
+        ),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(
+            attrs={
+                "class": "form-check-input",
+            }
+        ),
+        label="",
+        initial=("critical", "urgent", "normal")
+    )
+    assignee = forms.ModelChoiceField(
+        queryset=Worker.objects.all(),
+        required=False,
+        widget=forms.Select(
+            attrs={
+                "class": "form-control",
+                "style": "width: 300px",
+            }
+        ),
+        empty_label="Assignee username (all)",
+        label="",
+    )
+
+
 class WorkerSearchForm(forms.Form):
     search_field = forms.CharField(
         max_length=255,

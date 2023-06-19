@@ -9,7 +9,8 @@ from django.views import generic
 from tasks.forms import (
     TaskForm,
     WorkerCreationForm,
-    WorkerSearchForm
+    WorkerSearchForm,
+    TaskSearchForm,
 )
 from tasks.models import Task, Worker
 
@@ -130,6 +131,36 @@ class TaskListView(
 ):
     model = Task
     paginate_by = 10
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        search_field = self.request.GET.get("search_field", "")
+        priority = self.request.GET.getlist("priority")
+        if not priority:
+            priority = TaskSearchForm().fields["priority"].initial
+        context["search_form"] = TaskSearchForm(
+            initial={
+                "search_field": search_field,
+                "priority": priority,
+            }
+        )
+        return context
+
+    def get_queryset(self):
+        queryset = Task.objects.all()
+        form = TaskSearchForm(data=self.request.GET)
+        if form.is_valid():
+            search_query = form.cleaned_data["search_field"]
+            priority = form.cleaned_data["priority"]
+            if priority:
+                queryset = queryset.filter(priority__in=priority)
+            assignee = form.cleaned_data["assignee"]
+            if assignee:
+                queryset = queryset.filter(assignees__username=assignee)
+            return queryset.filter(
+                Q(name__icontains=search_query)
+            )
+        return queryset
 
 
 class TaskCreateView(
