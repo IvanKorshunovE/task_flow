@@ -11,18 +11,20 @@
     </a>
   </h1>
   <p>Task: {{ task.name }}</p>
-  <p>Description: {{ task.description }}</p>
   <p>Deadline: {{ task.deadline }}</p>
-
+  <h2>
+    Description
+  </h2>
+  <p>{{ task.description }}</p>
   <h1>
     Assignees
 
     {% if task in user.tasks.all %}
-      <a href="{% url 'tasks:assign-task' pk=task.id %}" class="btn btn-warning link-to-page">
+      <a href="{% url 'tasks:assign-task' pk=task.id %}?source=task-detail" class="btn btn-warning link-to-page">
         Delete me from this task
       </a>
     {% else %}
-      <a href="{% url 'tasks:assign-task' pk=task.id %}" class="btn btn-success link-to-page">
+      <a href="{% url 'tasks:assign-task' pk=task.id %}?source=task-detail" class="btn btn-info link-to-page">
         Assign me to this task
       </a>
     {% endif %}
@@ -31,11 +33,27 @@
   <hr>
   <ul>
     {% for assignee in task.assignees.all %}
-      <li>{{ assignee.username }}
+      <li>
+        <a href="{% url "tasks:worker-detail" pk=assignee.id %} ">
+          {{ assignee.username }}
+        </a>
         {% if assignee.last_name %}
           ({{ assignee.first_name }} {{ assignee.last_name }})
         {% endif %}
       </li>
     {% endfor %}
   </ul>
+  <h1>
+  {% if task in user.tasks.all %}
+    {% if task.is_completed %}
+      <a href="{% url "tasks:task-complete" pk=task.id %}" class="btn btn-secondary link-to-page">
+        Mark task as not completed
+      </a>
+    {% else %}
+      <a href="{% url "tasks:task-complete" pk=task.id %}" class="btn btn-success link-to-page">
+        Complete task
+      </a>
+    {% endif %}
+  {% endif %}
+  </h1>
 {% endblock %}

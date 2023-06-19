@@ -1,0 +1,9 @@
+{% if task in user.tasks.all %}
+  <a href="{% url 'tasks:assign-task' pk=task.id %}" class="btn btn-warning link-to-page">
+    Delete me from this task
+  </a>
+{% else %}
+  <a href="{% url 'tasks:assign-task' pk=task.id %}" class="btn btn-info link-to-page">
+    Assign me to this task
+  </a>
+{% endif %}

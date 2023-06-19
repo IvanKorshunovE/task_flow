@@ -11,31 +11,58 @@
     </a>
   </h1>
   <p>Username: {{ worker.username }}</p>
-  <p>First name: {{ worker.first_name }}</p>
-  <p>Last name: {{ worker.last_name }}</p>
-
+  {% if worker.first_name and worker.last_name %}
+    <p>First name: {{ worker.first_name }}</p>
+    <p>Last name: {{ worker.last_name }}</p>
+  {% endif %}
   <h1>
     Tasks
-{##}
-{#    {% if car in user.cars.all %}#}
-{#      <a href="{% url 'taxi:toggle-car-assign' pk=car.id %}" class="btn btn-danger link-to-page">#}
-{#        Delete me from this car#}
-{#      </a>#}
-{#    {% else %}#}
-{#      <a href="{% url 'taxi:toggle-car-assign' pk=car.id %}" class="btn btn-success link-to-page">#}
-{#        Assign me from this car#}
-{#      </a>#}
-{#    {% endif %}#}
-{##}
   </h1>
   <hr>
-  <ul>
+{#  <ul>#}
+  <table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Task name</th>
+      <th scope="col">Task priority</th>
+      <th scope="col">Task deadline</th>
+      <th scope="col">
+        Unassign task
+      </th>
+    </tr>
+  </thead>
+  <tbody>
     {% for task in worker.tasks.all %}
-      <li>{{ task.name }}
-{#        {% if assignee.last_name %}#}
-{#          ({{ assignee.first_name }} {{ assignee.last_name }})#}
-{#        {% endif %}#}
-      </li>
+        <tr
+            {% if task.priority == "critical" %} style="background-color: #ffcccc;"
+            {% elif task.priority == "urgent"%} style="background-color:  #ffe6cc;"
+            {% endif %}
+        >
+          <th scope="row">
+            <a href="{% url "tasks:task-detail" pk=task.id %} ">{{ task.id }}</a>
+          </th>
+          <td>{{ task.name }}</td>
+          <td>{{ task.priority }}</td>
+          <td>{{ task.deadline }}</td>
+          <td>
+{#            {% if task in user.tasks.all %}#}
+            {% if task in my_tasks %}
+              <a
+                  href="{% url 'tasks:assign-task' pk=task.id %}?source=worker-detail&worker_id={{ worker.id }}"
+                  class="btn btn-warning link-to-page">
+                Delete me from this task
+              </a>
+            {% else %}
+              <a
+                  href="{% url 'tasks:assign-task' pk=task.id %}?source=worker-detail&worker_id={{ worker.id }}"
+                 class="btn btn-info link-to-page">
+                Assign me to this task
+              </a>
+            {% endif %}
+          </td>
+        </tr>
     {% endfor %}
-  </ul>
+  </tbody>
+  </table>
 {% endblock %}

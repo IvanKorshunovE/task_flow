@@ -2,6 +2,7 @@ from django.urls import path
 
 from tasks.views import (
     index,
+    toggle_complete_task,
     toggle_assign_to_task,
     TaskListView,
     TaskCreateView,
@@ -21,6 +22,11 @@ urlpatterns = [
         "tasks/<int:pk>/assign",
         toggle_assign_to_task,
         name="assign-task"
+    ),
+    path(
+        "tasks/<int:pk>/complete",
+        toggle_complete_task,
+        name="task-complete"
     ),
     path(
         "tasks/",

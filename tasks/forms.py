@@ -48,6 +48,15 @@ class TaskSearchForm(forms.Form):
         empty_label="Assignee username (all)",
         label="",
     )
+    is_completed = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(
+            attrs={
+                "class": "form-check-input",
+            }
+        ),
+        label="Include completed tasks"
+    )
 
 
 class WorkerSearchForm(forms.Form):
@@ -104,4 +113,4 @@ class TaskForm(forms.ModelForm):
 
     class Meta:
         model = Task
-        fields = "__all__"
+        exclude = ['is_completed']

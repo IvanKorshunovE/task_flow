@@ -1,8 +1,9 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import generic
 
@@ -12,15 +13,20 @@ from tasks.forms import (
     WorkerSearchForm,
     TaskSearchForm,
 )
-from tasks.models import Task, Worker
+from tasks.models import (
+    Task,
+    Worker,
+)
 
 
+@login_required
 def index(request):
     """View function for the home page of the site."""
 
     num_tasks = Task.objects.count()
     num_workers = Worker.objects.count()
     num_of_critical_tasks = Task.objects.filter(priority="critical").count()
+    num_tasks_not_completed = Task.objects.filter(is_completed=False).count()
 
     num_visits = request.session.get("num_visits", 0)
     request.session["num_visits"] = num_visits + 1
@@ -29,25 +35,41 @@ def index(request):
         "num_tasks": num_tasks,
         "num_workers": num_workers,
         "num_of_critical_tasks": num_of_critical_tasks,
+        "num_tasks_not_completed": num_tasks_not_completed,
         "num_visits": num_visits + 1,
     }
 
     return render(request, "tasks/index.html", context=context)
 
 
+@login_required
+def toggle_complete_task(request, pk):
+    task = get_object_or_404(Task, pk=pk)
+    task.is_completed = not task.is_completed
+    task.save()
+    return HttpResponseRedirect(reverse_lazy("tasks:task-detail", args=[pk]))
+
+
+@login_required
 def toggle_assign_to_task(request, pk):
     worker = Worker.objects.get(id=request.user.id)
     if (
-        Task.objects.get(id=pk) in worker.tasks.all()
+            Task.objects.get(id=pk) in worker.tasks.all()
     ):
         worker.tasks.remove(pk)
     else:
         worker.tasks.add(pk)
+    source = request.GET.get("source")
+    worker_id = request.GET.get("worker_id")
+    if source == "worker-detail":
+        return HttpResponseRedirect(reverse_lazy("tasks:worker-detail", args=[worker_id]))
+    elif source == "task-detail":
+        return HttpResponseRedirect(reverse_lazy("tasks:task-detail", args=[pk]))
     return HttpResponseRedirect(reverse_lazy("tasks:task-detail", args=[pk]))
 
 
 class WorkerListView(
-    # LoginRequiredMixin,
+    LoginRequiredMixin,
     generic.ListView
 ):
     model = Worker
@@ -75,14 +97,21 @@ class WorkerListView(
 
 
 class WorkerDetailView(
-    # LoginRequiredMixin,
+    LoginRequiredMixin,
     generic.DetailView
 ):
     model = Worker
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        my_tasks = Task.objects.filter(assignees=user)
+        context["my_tasks"] = my_tasks
+        return context
+
 
 class WorkerCreateView(
-    # LoginRequiredMixin,
+    LoginRequiredMixin,
     generic.CreateView
 ):
     model = Worker
@@ -96,7 +125,7 @@ class WorkerCreateView(
 
 
 class WorkerUpdateView(
-    # LoginRequiredMixin,
+    LoginRequiredMixin,
     generic.UpdateView
 ):
     model = Worker
@@ -113,7 +142,7 @@ class WorkerUpdateView(
 
 
 class WorkerDeleteView(
-    # LoginRequiredMixin,
+    LoginRequiredMixin,
     generic.DeleteView
 ):
     model = Worker
@@ -126,7 +155,7 @@ class WorkerDeleteView(
 
 
 class TaskListView(
-    # LoginRequiredMixin,
+    LoginRequiredMixin,
     generic.ListView
 ):
     model = Task
@@ -136,12 +165,16 @@ class TaskListView(
         context = super().get_context_data(**kwargs)
         search_field = self.request.GET.get("search_field", "")
         priority = self.request.GET.getlist("priority")
+        assignee = self.request.GET.getlist("assignee")
+        is_completed = self.request.GET.get("is_completed")
         if not priority:
             priority = TaskSearchForm().fields["priority"].initial
         context["search_form"] = TaskSearchForm(
             initial={
                 "search_field": search_field,
                 "priority": priority,
+                "assignee": assignee,
+                "is_completed": is_completed,
             }
         )
         return context
@@ -152,6 +185,9 @@ class TaskListView(
         if form.is_valid():
             search_query = form.cleaned_data["search_field"]
             priority = form.cleaned_data["priority"]
+            is_completed = form.cleaned_data["is_completed"]
+            if not is_completed:
+                queryset = queryset.filter(is_completed=False)
             if priority:
                 queryset = queryset.filter(priority__in=priority)
             assignee = form.cleaned_data["assignee"]
@@ -164,7 +200,7 @@ class TaskListView(
 
 
 class TaskCreateView(
-    # LoginRequiredMixin,
+    LoginRequiredMixin,
     generic.CreateView
 ):
     model = Task
@@ -178,14 +214,14 @@ class TaskCreateView(
 
 
 class TaskDetailView(
-    # LoginRequiredMixin,
+    LoginRequiredMixin,
     generic.DetailView
 ):
     model = Task
 
 
 class TaskUpdateView(
-    # LoginRequiredMixin,
+    LoginRequiredMixin,
     generic.UpdateView
 ):
     model = Task
@@ -202,7 +238,7 @@ class TaskUpdateView(
 
 
 class TaskDeleteView(
-    # LoginRequiredMixin,
+    LoginRequiredMixin,
     generic.DeleteView
 ):
     model = Task

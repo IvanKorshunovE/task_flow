@@ -9,17 +9,37 @@
   </h1>
 
   {% include 'includes/searchbar_task.html' %}
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Task name</th>
+      <th scope="col">Task priority</th>
+      <th scope="col">Task deadline</th>
+    </tr>
+  </thead>
+  <tbody>
 
   {% if task_list %}
     <ul>
       {% for task in task_list %}
-        <li>
-          <a href="{% url "tasks:task-detail" pk=task.id %} ">{{ task.id }}</a>
-          {{ task.name }} ({{ task.priority }})
-        </li>
+        <tr
+            {% if task.priority == "critical" %} style="background-color: #ffcccc;"
+            {% elif task.priority == "urgent"%} style="background-color:  #ffe6cc;"
+            {% endif %}
+        >
+          <th scope="row">
+            <a href="{% url "tasks:task-detail" pk=task.id %} ">{{ task.id }}</a>
+          </th>
+          <td>{{ task.name }}</td>
+          <td>{{ task.priority }}</td>
+          <td>{{ task.deadline }}</td>
+        </tr>
       {% endfor %}
     </ul>
   {% else %}
     <p>There are no tasks</p>
   {% endif %}
+  </tbody>
+</table>
 {% endblock %}
