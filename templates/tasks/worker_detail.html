@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>
+    {{ worker.username }}
+    <a href="{% url 'tasks:worker-update' pk=worker.id %}" class="btn btn-secondary link-to-page">
+      Update worker's information
+    </a>
+    <a href="{% url 'tasks:worker-delete' pk=worker.id %}" class="btn btn-danger link-to-page">
+      Delete worker
+    </a>
+  </h1>
+  <p>Username: {{ worker.username }}</p>
+  <p>First name: {{ worker.first_name }}</p>
+  <p>Last name: {{ worker.last_name }}</p>
+
+  <h1>
+    Tasks
+{##}
+{#    {% if car in user.cars.all %}#}
+{#      <a href="{% url 'taxi:toggle-car-assign' pk=car.id %}" class="btn btn-danger link-to-page">#}
+{#        Delete me from this car#}
+{#      </a>#}
+{#    {% else %}#}
+{#      <a href="{% url 'taxi:toggle-car-assign' pk=car.id %}" class="btn btn-success link-to-page">#}
+{#        Assign me from this car#}
+{#      </a>#}
+{#    {% endif %}#}
+{##}
+  </h1>
+  <hr>
+  <ul>
+    {% for task in worker.tasks.all %}
+      <li>{{ task.name }}
+{#        {% if assignee.last_name %}#}
+{#          ({{ assignee.first_name }} {{ assignee.last_name }})#}
+{#        {% endif %}#}
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

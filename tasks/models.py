@@ -26,6 +26,9 @@ class Worker(AbstractUser):
         verbose_name = "Worker"
         verbose_name_plural = "Workers"
 
+    def get_absolute_url(self):
+        return reverse("tasks:worker-detail", kwargs={"pk": self.pk})
+
 
 class TaskType(models.Model):
     name = models.CharField(max_length=255)
