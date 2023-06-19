@@ -7,6 +7,22 @@ from django.forms import DateInput
 from tasks.models import Task, Worker
 
 
+class WorkerSearchForm(forms.Form):
+    search_field = forms.CharField(
+        max_length=255,
+        required=False,
+        label="",
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "Search by username, first name, last name",
+                "class": "form-control;",
+                "style": "width: 400px",
+                "type": "text",
+            }
+        )
+    )
+
+
 class WorkerCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = Worker

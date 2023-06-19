@@ -1,11 +1,16 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import generic
 
-from tasks.forms import TaskForm, WorkerCreationForm
+from tasks.forms import (
+    TaskForm,
+    WorkerCreationForm,
+    WorkerSearchForm
+)
 from tasks.models import Task, Worker
 
 
@@ -46,6 +51,26 @@ class WorkerListView(
 ):
     model = Worker
     paginate_by = 10
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        search_field = self.request.GET.get("search_field", "")
+        context["search_form"] = WorkerSearchForm(
+            initial={"search_field": search_field}
+        )
+        return context
+
+    def get_queryset(self):
+        queryset = Worker.objects.all()
+        form = WorkerSearchForm(data=self.request.GET)
+        if form.is_valid():
+            search_query = form.cleaned_data["search_field"]
+            return queryset.filter(
+                Q(username__icontains=search_query)
+                | Q(first_name__icontains=search_query)
+                | Q(last_name__icontains=search_query)
+            )
+        return queryset
 
 
 class WorkerDetailView(
