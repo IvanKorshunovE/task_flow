@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import generic
@@ -26,6 +27,17 @@ def index(request):
     }
 
     return render(request, "tasks/index.html", context=context)
+
+
+def toggle_assign_to_task(request, pk):
+    worker = Worker.objects.get(id=request.user.id)
+    if (
+        Task.objects.get(id=pk) in worker.tasks.all()
+    ):
+        worker.tasks.remove(pk)
+    else:
+        worker.tasks.add(pk)
+    return HttpResponseRedirect(reverse_lazy("tasks:task-detail", args=[pk]))
 
 
 class WorkerListView(
@@ -85,12 +97,6 @@ class WorkerDeleteView(
         response = super().post(request, *args, **kwargs)
         messages.warning(request, "Worker has been deleted.")
         return response
-
-
-
-
-
-
 
 
 class TaskListView(
