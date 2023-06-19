@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>
+    Task list
+    <a href="{% url 'tasks:task-create' %}" class="btn btn-primary link-to-page">
+      Create
+    </a>
+  </h1>
+
+{#  {% include 'includes/searchbar.html' %}#}
+
+  {% if task_list %}
+    <ul>
+      {% for task in task_list %}
+        <li>
+          <a href="{% url "tasks:task-detail" pk=task.id %} ">{{ task.id }}</a>
+          {{ task.name }} ({{ task.priority }})
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>There are no tasks</p>
+  {% endif %}
+{% endblock %}

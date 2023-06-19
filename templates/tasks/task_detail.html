@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>
+    {{ task.name }}
+    <a href="{% url 'tasks:task-update' pk=task.id %}" class="btn btn-secondary link-to-page">
+      Update task
+    </a>
+    <a href="{% url 'tasks:task-delete' pk=task.id %}" class="btn btn-danger link-to-page">
+      Delete task
+    </a>
+  </h1>
+  <p>Task: {{ task.name }}</p>
+  <p>Description: {{ task.description }}</p>
+  <p>Deadline: {{ task.deadline }}</p>
+
+  <h1>
+    Assignees
+{##}
+{#    {% if car in user.cars.all %}#}
+{#      <a href="{% url 'taxi:toggle-car-assign' pk=car.id %}" class="btn btn-danger link-to-page">#}
+{#        Delete me from this car#}
+{#      </a>#}
+{#    {% else %}#}
+{#      <a href="{% url 'taxi:toggle-car-assign' pk=car.id %}" class="btn btn-success link-to-page">#}
+{#        Assign me from this car#}
+{#      </a>#}
+{#    {% endif %}#}
+{##}
+  </h1>
+  <hr>
+  <ul>
+    {% for assignee in task.assignees.all %}
+      <li>{{ assignee.username }}
+        {% if assignee.last_name %}
+          ({{ assignee.first_name }} {{ assignee.last_name }})
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}
