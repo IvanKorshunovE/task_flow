@@ -173,7 +173,9 @@ class PrivateTaskTest(TestCase):
             position=self.position
         )
 
-        self.task_type1 = TaskType.objects.create(name="Bug fix")
+        self.task_type1 = TaskType.objects.create(
+            name="Bug fix"
+        )
 
         self.task1 = Task.objects.create(
             name="Task 1",
