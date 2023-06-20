@@ -1,9 +1,9 @@
 from django.urls import path
 
 from tasks.views import (
-    index,
-    toggle_complete_task,
-    toggle_assign_to_task,
+    IndexView,
+    ToggleCompleteTaskView,
+    ToggleAssignToTaskView,
     TaskListView,
     TaskCreateView,
     TaskDetailView,
@@ -17,15 +17,19 @@ from tasks.views import (
 )
 
 urlpatterns = [
-    path("", index, name="index"),
+    path(
+        "",
+        IndexView.as_view(),
+        name="index"
+    ),
     path(
         "tasks/<int:pk>/assign/",
-        toggle_assign_to_task,
+        ToggleAssignToTaskView.as_view(),
         name="assign-task"
     ),
     path(
         "tasks/<int:pk>/complete/",
-        toggle_complete_task,
+        ToggleCompleteTaskView.as_view(),
         name="task-complete"
     ),
     path(

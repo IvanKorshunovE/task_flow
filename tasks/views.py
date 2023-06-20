@@ -1,11 +1,10 @@
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
-from django.urls import reverse_lazy
-from django.views import generic
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse_lazy, reverse
+from django.views import generic, View
 
 from tasks.forms import (
     TaskForm,
@@ -19,53 +18,87 @@ from tasks.models import (
 )
 
 
-@login_required
-def index(request):
-    """View function for the home page of the site."""
+class IndexView(LoginRequiredMixin, View):
+    # @login_required
+    def get(self, request):
+        """View function for the home page of the site."""
+        num_tasks = Task.objects.count()
+        num_workers = Worker.objects.count()
+        num_of_critical_tasks = Task.objects.filter(
+            priority="critical"
+        ).count()
+        num_tasks_not_completed = Task.objects.filter(
+            is_completed=False
+        ).count()
 
-    num_tasks = Task.objects.count()
-    num_workers = Worker.objects.count()
-    num_of_critical_tasks = Task.objects.filter(priority="critical").count()
-    num_tasks_not_completed = Task.objects.filter(is_completed=False).count()
+        num_visits = request.session.get(
+            "num_visits", 0
+        )
+        request.session["num_visits"] = num_visits + 1
 
-    num_visits = request.session.get("num_visits", 0)
-    request.session["num_visits"] = num_visits + 1
+        context = {
+            "num_tasks": num_tasks,
+            "num_workers": num_workers,
+            "num_of_critical_tasks": num_of_critical_tasks,
+            "num_tasks_not_completed": num_tasks_not_completed,
+            "num_visits": num_visits + 1,
+        }
 
-    context = {
-        "num_tasks": num_tasks,
-        "num_workers": num_workers,
-        "num_of_critical_tasks": num_of_critical_tasks,
-        "num_tasks_not_completed": num_tasks_not_completed,
-        "num_visits": num_visits + 1,
-    }
-
-    return render(request, "tasks/index.html", context=context)
-
-
-@login_required
-def toggle_complete_task(request, pk):
-    task = get_object_or_404(Task, pk=pk)
-    task.is_completed = not task.is_completed
-    task.save()
-    return HttpResponseRedirect(reverse_lazy("tasks:task-detail", args=[pk]))
+        return render(
+            request,
+            "tasks/index.html",
+            context=context
+        )
 
 
-@login_required
-def toggle_assign_to_task(request, pk):
-    worker = Worker.objects.get(id=request.user.id)
-    if (
-            Task.objects.get(id=pk) in worker.tasks.all()
-    ):
-        worker.tasks.remove(pk)
-    else:
-        worker.tasks.add(pk)
-    source = request.GET.get("source")
-    worker_id = request.GET.get("worker_id")
-    if source == "worker-detail":
-        return HttpResponseRedirect(reverse_lazy("tasks:worker-detail", args=[worker_id]))
-    elif source == "task-detail":
-        return HttpResponseRedirect(reverse_lazy("tasks:task-detail", args=[pk]))
-    return HttpResponseRedirect(reverse_lazy("tasks:task-detail", args=[pk]))
+class ToggleCompleteTaskView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        task = get_object_or_404(Task, pk=pk)
+        task.is_completed = not task.is_completed
+        task.save()
+        return redirect(reverse(
+            "tasks:task-detail",
+            kwargs={"pk": pk})
+        )
+
+
+class ToggleAssignToTaskView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        worker = get_object_or_404(
+            Worker,
+            id=request.user.id
+        )
+        task = get_object_or_404(Task, id=pk)
+
+        if task in worker.tasks.all():
+            worker.tasks.remove(task)
+        else:
+            worker.tasks.add(task)
+
+        source = request.GET.get("source")
+        worker_id = request.GET.get("worker_id")
+
+        if source == "worker-detail":
+            return HttpResponseRedirect(
+                reverse(
+                    "tasks:worker-detail",
+                    args=[worker_id]
+                )
+            )
+        elif source == "task-detail":
+            return HttpResponseRedirect(
+                reverse(
+                    "tasks:task-detail",
+                    args=[pk]
+                )
+            )
+
+        return HttpResponseRedirect(
+            reverse(
+                "tasks:task-detail",
+                args=[pk]
+            )
+        )
 
 
 class WorkerListView(
@@ -120,7 +153,10 @@ class WorkerCreateView(
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        messages.success(self.request, "The new worker has been created.")
+        messages.success(
+            self.request,
+            "The new worker has been created."
+        )
         return response
 
 
@@ -192,7 +228,9 @@ class TaskListView(
                 queryset = queryset.filter(priority__in=priority)
             assignee = form.cleaned_data["assignee"]
             if assignee:
-                queryset = queryset.filter(assignees__username=assignee)
+                queryset = queryset.filter(
+                    assignees__username=assignee
+                )
             return queryset.filter(
                 Q(name__icontains=search_query)
             )
@@ -209,7 +247,10 @@ class TaskCreateView(
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        messages.success(self.request, "The task has been created.")
+        messages.success(
+            self.request,
+            "The task has been created."
+        )
         return response
 
 
