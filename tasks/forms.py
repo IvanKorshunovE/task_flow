@@ -36,16 +36,15 @@ class TaskSearchForm(forms.Form):
         label="",
         initial=("critical", "urgent", "normal")
     )
-    assignee = forms.ModelChoiceField(
-        queryset=Worker.objects.all(),
+    assignee = forms.CharField(
         required=False,
-        widget=forms.Select(
+        widget=forms.TextInput(
             attrs={
                 "class": "form-control",
                 "style": "width: 300px",
+                "placeholder": "Search by assignee username"
             }
         ),
-        empty_label="Assignee username (all)",
         label="",
     )
     is_completed = forms.BooleanField(
@@ -85,14 +84,17 @@ class WorkerCreationForm(UserCreationForm):
         )
 
     def clean_username(self):
-        if self.instance.pk and self.cleaned_data.get('username') == self.instance.username:
+        if (self.instance.pk and self.cleaned_data.get('username') ==
+                self.instance.username):
             return self.cleaned_data.get('username')
         username = self.cleaned_data.get('username')
         try:
             Worker.objects.get(username=username)
         except Worker.DoesNotExist:
             return username
-        raise ValidationError("A user with that username already exists.")
+        raise ValidationError(
+            "A user with that username already exists."
+        )
 
 
 class TaskForm(forms.ModelForm):

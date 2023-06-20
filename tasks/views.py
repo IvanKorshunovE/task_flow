@@ -19,7 +19,6 @@ from tasks.models import (
 
 
 class IndexView(LoginRequiredMixin, View):
-    # @login_required
     def get(self, request):
         """View function for the home page of the site."""
         num_tasks = Task.objects.count()
@@ -201,7 +200,7 @@ class TaskListView(
         context = super().get_context_data(**kwargs)
         search_field = self.request.GET.get("search_field", "")
         priority = self.request.GET.getlist("priority")
-        assignee = self.request.GET.getlist("assignee")
+        assignee = self.request.GET.get("assignee", "")
         is_completed = self.request.GET.get("is_completed")
         if not priority:
             priority = TaskSearchForm().fields["priority"].initial
@@ -229,7 +228,7 @@ class TaskListView(
             assignee = form.cleaned_data["assignee"]
             if assignee:
                 queryset = queryset.filter(
-                    assignees__username=assignee
+                    assignees__username__icontains=assignee
                 )
             return queryset.filter(
                 Q(name__icontains=search_query)
