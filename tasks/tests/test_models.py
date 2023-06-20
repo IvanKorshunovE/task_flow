@@ -38,12 +38,12 @@ class ModelTests(TestCase):
         self.assertEqual(str(self.task), "Task 1")
 
     def test_task_absolute_url(self):
-        expected_url = "/tasks/task-detail/{}/".format(self.task.pk)
+        expected_url = "/tasks/{}/".format(self.task.pk)
         self.assertEqual(self.task.get_absolute_url(), expected_url)
 
     def test_task_ordering(self):
         task1 = Task.objects.create(
-            name="Task 1",
+            name="Task 2",
             description="test_description",
             deadline="2023-06-20",
             is_completed=False,
@@ -51,7 +51,7 @@ class ModelTests(TestCase):
             task_type=self.task_type
         )
         task2 = Task.objects.create(
-            name="Task 2",
+            name="Task 3",
             description="test_description",
             deadline="2023-06-20",
             is_completed=False,
@@ -59,14 +59,14 @@ class ModelTests(TestCase):
             task_type=self.task_type
         )
         task3 = Task.objects.create(
-            name="Task 3",
+            name="Task 4",
             description="test_description",
             deadline="2023-06-20",
             is_completed=False,
             priority="critical",
             task_type=self.task_type
         )
-        tasks_ordered = [task3, task2, self.task, task1]
+        tasks_ordered = [self.task, task3, task2, task1]
         self.assertQuerysetEqual(Task.objects.all(), tasks_ordered, transform=lambda x: x)
 
     def test_task_assignees(self):
