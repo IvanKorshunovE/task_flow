@@ -19,12 +19,12 @@ from tasks.views import (
 urlpatterns = [
     path("", index, name="index"),
     path(
-        "tasks/<int:pk>/assign",
+        "tasks/<int:pk>/assign/",
         toggle_assign_to_task,
         name="assign-task"
     ),
     path(
-        "tasks/<int:pk>/complete",
+        "tasks/<int:pk>/complete/",
         toggle_complete_task,
         name="task-complete"
     ),
@@ -34,7 +34,7 @@ urlpatterns = [
         name="task-list",
     ),
     path(
-        "tasks/create",
+        "tasks/create/",
         TaskCreateView.as_view(),
         name="task-create",
     ),
@@ -59,7 +59,7 @@ urlpatterns = [
         name="worker-list",
     ),
     path(
-        "workers/create",
+        "workers/create/",
         WorkerCreateView.as_view(),
         name="worker-create",
     ),
