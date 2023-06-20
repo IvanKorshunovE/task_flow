@@ -25,6 +25,7 @@ class Worker(AbstractUser):
     class Meta:
         verbose_name = "Worker"
         verbose_name_plural = "Workers"
+        ordering = ["username"]
 
     def get_absolute_url(self):
         return reverse("tasks:worker-detail", kwargs={"pk": self.pk})
