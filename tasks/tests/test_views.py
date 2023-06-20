@@ -185,6 +185,60 @@ class PrivateTaskTest(TestCase):
             priority="critical",
             task_type=self.task_type1
         )
+        self.task2 = Task.objects.create(
+            name="Task 2",
+            description="test_description 2",
+            deadline="2023-06-20",
+            is_completed=False,
+            priority="normal",
+            task_type=self.task_type1
+        )
         self.task1.assignees.add(self.worker1)
+        self.task2.assignees.add(self.worker2)
 
         self.factory = RequestFactory()
+
+    def test_retrieve_task_list(self):
+        response = self.client.get(TASKS_URL)
+        tasks = Task.objects.all()
+
+        self.assertEquals(response.status_code, 200)
+        self.assertContains(response, self.task1.name)
+        self.assertEquals(
+            list(response.context_data["task_list"]),
+            list(tasks)
+        )
+        self.assertTemplateUsed(
+            response,
+            "tasks/task_list.html"
+        )
+
+    def test_search_filters_worker_list(self):
+        response = self.client.get(
+            TASKS_URL,
+            {"search_field": "Task 1"}
+        )
+        response_2 = self.client.get(
+            TASKS_URL,
+            {"priority": "normal"}
+        )
+        response_3 = self.client.get(
+            TASKS_URL,
+            {"assignee": self.worker1.pk}
+        )
+        tasks = Task.objects.filter(
+            name__icontains="Task 1"
+        )
+
+        self.assertEquals(response.status_code, 200)
+        self.assertContains(response, self.task1.name)
+        self.assertContains(response_2, self.task2.name)
+        self.assertContains(response_3, self.task1.name)
+        self.assertNotContains(response, self.task2.name)
+        self.assertNotContains(response_2, self.task1.name)
+        self.assertNotContains(response_3, self.task2.name)
+
+        self.assertEqual(
+            list(response.context_data["task_list"]),
+            list(tasks)
+        )
