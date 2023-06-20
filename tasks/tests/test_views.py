@@ -224,7 +224,7 @@ class PrivateTaskTest(TestCase):
         )
         response_3 = self.client.get(
             TASKS_URL,
-            {"assignee": self.worker1.pk}
+            {"assignee": "worker1"}
         )
         tasks = Task.objects.filter(
             name__icontains="Task 1"
