@@ -85,11 +85,8 @@ class WorkerCreationForm(UserCreationForm):
         )
 
     def clean_username(self):
-        # Skip uniqueness validation if the form is used for updating an existing worker
         if self.instance.pk and self.cleaned_data.get('username') == self.instance.username:
             return self.cleaned_data.get('username')
-
-        # Otherwise, perform the default uniqueness validation
         username = self.cleaned_data.get('username')
         try:
             Worker.objects.get(username=username)
