@@ -62,7 +62,7 @@ class Task(models.Model):
         TaskType,
         on_delete=models.SET_NULL,
         null=True,
-        related_name="task"
+        related_name="tasks"
     )
     assignees = models.ManyToManyField(
         Worker,

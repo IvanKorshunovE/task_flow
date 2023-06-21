@@ -77,24 +77,20 @@ class ToggleAssignToTaskView(LoginRequiredMixin, View):
         source = request.GET.get("source")
         worker_id = request.GET.get("worker_id")
 
-        if source == "worker-detail":
-            return HttpResponseRedirect(
-                reverse(
-                    "tasks:worker-detail",
-                    args=[worker_id]
-                )
-            )
-        elif source == "task-detail":
-            return HttpResponseRedirect(
-                reverse(
-                    "tasks:task-detail",
-                    args=[pk]
-                )
-            )
+        pk = (
+            worker_id
+            if source == "worker-detail"
+            else pk
+        )
+        source = (
+            source
+            if source in ["worker-detail", "task-detail"]
+            else "task-detail"
+        )
 
         return HttpResponseRedirect(
             reverse(
-                "tasks:task-detail",
+                f"tasks:{source}",
                 args=[pk]
             )
         )
