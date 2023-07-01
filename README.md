@@ -32,7 +32,7 @@ What's all the bells and whistles this project can perform?
 
 ## Demo 
 
-![Screenshot 2023-07-01 at 13.48.20.png](..%2F..%2F..%2F..%2Fvar%2Ffolders%2F1k%2Fsw2vzx3d4tj3yn8tx4fcmd_40000gn%2FT%2FTemporaryItems%2FNSIRD_screencaptureui_Iew2IY%2FScreenshot%202023-07-01%20at%2013.48.20.png)
+![task_manager_demo.png](task_manager_demo.png)
 
 [//]: # (## Configuration)
 
