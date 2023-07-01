@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>
+  Workers list
+  <a href="{% url 'tasks:worker-create' %}" class="btn btn-primary link-to-page">
+  Create
+  </a>
+</h1>
+{% include 'includes/searchbar.html' %}
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Username</th>
+      <th scope="col">First name</th>
+      <th scope="col">Last name</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if worker_list %}
+    {% for worker in worker_list %}
+    <tr>
+      <th scope="row">
+        <a href="{% url "tasks:worker-detail" pk=worker.id %} ">{{ worker.id }}</a>
+      </th>
+      <td>{{ worker.username }}</td>
+      <td>{{ worker.first_name }}</td>
+      <td>{{ worker.last_name }}</td>
+    </tr>
+    {% endfor %}
+    {% else %}
+    <td colspan="4">There are no workers</td>
+    {% endif %}
+  <tbody>
+</table>
+{% endblock %}

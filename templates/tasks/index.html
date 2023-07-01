@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Task Manager Home Page</h1>
+<p>Empower Your Productivity with Task Manager!</p>
+<h2>Dynamic content</h2>
+<p>The Task Manager service has the following record counts:</p>
+<ul>
+  <li><strong>Tasks:</strong> {{ num_tasks }}</li>
+  <li><strong>Tasks that are not completed:</strong> {{ num_tasks_not_completed }}</li>
+  <li><strong>Workers:</strong> {{ num_workers }}</li>
+  <li><strong>Critical tasks:</strong> {{ num_of_critical_tasks }}</li>
+</ul>
+<p>You have visited this page
+  {{ num_visits }} time{{ num_visits|pluralize }}.
+</p>
+{% endblock %}
