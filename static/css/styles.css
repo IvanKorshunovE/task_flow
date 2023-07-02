@@ -4,3 +4,7 @@
 .inline-checkboxes .checkbox-inline {
     display: inline-block;
 }
+body {
+    margin-top: 320px;
+    background-color: red;
+}
