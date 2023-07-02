@@ -11,7 +11,7 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 
 DEBUG = os.environ.get("DJANGO_DEBUG", "") != "False"
 
-ALLOWED_HOSTS = ["127.0.0.1"]
+ALLOWED_HOSTS = ["127.0.0.1", "task-manager-y3r3.onrender.com"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
